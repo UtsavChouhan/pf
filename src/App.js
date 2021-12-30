@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { Controls } from "./components/Controls/Controls";
@@ -8,11 +9,12 @@ const AppContainer = styled.div`
 background-image: #EBEEFC;
 `;
 function App() {
+  const [grid, setGrid] = useState(null);
   return (
     <AppContainer>
       <Header />
-      <Controls />
-      <Grid />
+      <Controls grid={grid} updateGrid={setGrid} />
+      <Grid grid={grid} updateGrid={setGrid} />
     </AppContainer>
   );
 }

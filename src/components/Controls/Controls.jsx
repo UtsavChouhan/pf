@@ -2,11 +2,12 @@ import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { randomMazeGenerator } from "../../helper/helper";
-import { resetGrid, setEntry, setExit, setGrid } from "../../redux/general";
+import { resetGrid, setEntry, setExit, setInProgress } from "../../redux/general";
 import { FaAngleDown, FaAngleUp } from 'react-icons/fa';
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Box from "../Box";
 import { entryType, exitType, pathType, searchType, wallType } from "../../config/config";
+import { startDepthFirstSearchAlgo } from "../../algorithms/dfsAlgo";
 
 const ControlsContainer = styled.div`
   background-color: #EBEEFC;
@@ -15,17 +16,19 @@ const ControlsContainer = styled.div`
 const Row = styled.div`
   // margin: 10px;
   background-color: #EBEEFC;
-  // display: flex;
-  // justify-content: center;
-  // align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
 `;
 
 const NodeContainer = styled.div`
 grid-template-rows: 20px;
-padding: 0.4em 2em 1.4em 2em;
+padding: 2em 2em 1.4em 2em;
 color: #5F6366;
 grid-template-cols: 20px;
 display: inline-flex;
+justify-content: center;
 & > div {
   width: 20px;
 }
@@ -58,7 +61,7 @@ color: #5F6366;
 `;
 const Element = styled("div")`
 // margin-bottom: 0.8em;
-padding: 0.4em 2em 1.4em 2em;
+padding: 0 2em 0 2em;
 // box-shadow: 0 2px 3px rgba(0, 0, 0, 0.15);
 font-weight: 500;
 display: flex;
@@ -139,22 +142,47 @@ const AlgoMap = new Map([
 [9, ""]
 ])
 
-export const Controls = () => {
+export const Controls = ({grid, updateGrid}) => {
   const [openDrawer, setOpenDrawer] = useState(null);
+  const isInProgress = useRef(false);
   const [algorithm, setAlgorithm] = useState(9);
   const dispatch = useDispatch();
-  const {rows, cols} = useSelector(state => state.general);
+  const {rows, cols, entry, exit} = useSelector(state => state.general);
   const generateMaze = () => {
     const [grid, newEntry, newExit] = randomMazeGenerator(rows, cols);
     // entry.current = newEntry;
     // exit.current = newExit;
     dispatch(setEntry(newEntry));
     dispatch(setExit(newExit));
-    dispatch(setGrid(grid));
+    isInProgress.current = false;
+
+    // dispatch(setGrid(grid));
+    updateGrid(grid);
+  }
+  const setGrid = (gr) => {
+    updateGrid(gr);
+    // dispatch(setGrid(gr))
   }
   const resetMaze = () => {
-    dispatch(resetGrid());
+    // dispatch(resetGrid());
+      // state.entry = {x: -1, y: -1};
+      // state.exit = {x: -1, y: -1};
+      isInProgress.current = false;
+      updateGrid(Array.from(new Array(rows), () => new Array(cols).fill(0)));
   }
+  const startDFS = async() => {
+    if (entry.x < 0 || exit.x < 0) {
+      console.log("Entry & Exit are mandatory", { toastId: 0 }); // just an id to prevent duplicates
+      return false;
+    }
+
+    // await dispatch(setInProgress(true));
+    isInProgress.current = true;
+    console.log('1', isInProgress)
+    // const newG = Array.from(grid);
+    await startDepthFirstSearchAlgo(grid, setGrid, entry, exit, isInProgress)
+  }
+
   return(
     <ControlsContainer>
     <Row>
@@ -246,6 +274,9 @@ export const Controls = () => {
           </DropDownList>
         </DropDownListContainer>}
       </DropDownContainer>
+      <Element onClick={() => startDFS()}>
+      Perform DFS
+      </Element>
     </Row>
     <Row>
       <NodeContainer>

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { cellGap, cellWidth } from "../../config/config";
 import { generateGrid } from "../../helper/helper";
-import { setGrid } from "../../redux/general";
+// import { setGrid } from "../../redux/general";
 import Box from "../Box";
 
 const GridContainer = styled.div`
@@ -15,11 +15,12 @@ grid-column-gap: ${cellGap}px;
 grid-row-gap: ${cellGap}px;
 `;
 
-export const Grid = () => {
-  const {rows, cols, grid} = useSelector(state => state.general);
+export const Grid = ({grid, updateGrid}) => {
+  const {rows, cols} = useSelector(state => state.general);
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(setGrid(generateGrid(rows, cols, 0)))
+    // dispatch(setGrid(generateGrid(rows, cols, 0)))
+    updateGrid(generateGrid(rows, cols, 0))
   }, []);
 
   return(

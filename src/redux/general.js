@@ -24,6 +24,9 @@ export const generalSlice = createSlice({
     setExit: (state, action) => {
       state.exit = action.payload;
     },
+    setInProgress: (state, action) => {
+      state.inProgress = action.payload;
+    },
     resetGrid: (state) => {
       const {rows, cols} = state;
       state.entry = {x: -1, y: -1};
@@ -34,6 +37,6 @@ export const generalSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { setGrid, resetGrid, setEntry, setExit } = generalSlice.actions
+export const { setGrid, resetGrid, setEntry, setExit, setInProgress } = generalSlice.actions
 
 export default generalSlice.reducer
